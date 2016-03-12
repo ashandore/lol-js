@@ -115,7 +115,7 @@ exports.methods = {
             rateLimit: false
         }
         cacheParams = {
-            key: "#{api.fullname}-champions-#{region}-#{options.locale}-#{options.version}-" +
+            key: "#{api.fullname}-items-#{region}-#{options.locale}-#{options.version}-" +
                 options.tags.join(",")
             api, region, objectType: 'items', params: requestParams.queryParams
         }
@@ -131,6 +131,30 @@ exports.methods = {
         @getItems(region, options)
         .then (objects) ->
             return objects.data[id]
+
+    getSummonerSpells: pb.break (region, options={}) ->
+        options = ld.defaults {}, options, {
+            dataById: false
+        }
+
+        requestParams = {
+            caller: "getSummonerSpells",
+            region: region,
+            url: "#{makeUrl region, api}/summoner-spell",
+            queryParams: ld.pick options, ['locale', 'version', 'tags']
+            rateLimit: false
+        }
+        cacheParams = {
+            key: "#{api.fullname}-spells-#{region}-#{options.locale}-#{options.version}-" +
+                options.tags.join(",")
+            api, region, objectType: 'spells', params: requestParams.queryParams
+        }
+        @_riotRequestWithCache requestParams, cacheParams, {}
+
+    getSummonerSpellById: pb.break (region, id, options={}) ->
+        @getSummonerSpells(region, options)
+        .then (objects) ->
+            return (spell for spell in objects.data when spell.id == id)
 
     # TODO: Lots more things to implement here.
 
